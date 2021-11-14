@@ -9,4 +9,4 @@ typings/
 node_modules/
 
 # Private key
-src/database/private-key
+src/database/private-key.ts
