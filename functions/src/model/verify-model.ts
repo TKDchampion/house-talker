@@ -26,9 +26,19 @@ class VerifyModel {
   }
 
   public getToken(req: any) {
-    return !!req.header("Authorization")
-      ? jwt.verify(req.header("Authorization").replace("Bearer ", ""), Key.JWT)
-      : this.formatResultErrorFn;
+    const token = req.header("Authorization");
+    if (!token) {
+      return;
+    }
+
+    try {
+      return jwt.verify(
+        req.header("Authorization").replace("Bearer ", ""),
+        Key.JWT
+      );
+    } catch (error) {
+      return;
+    }
   }
 
   public formatResultErrorFn = (result: any) => {

@@ -39,7 +39,7 @@ class UserModel {
 
   public createOrUpdateArticle(req: any, type: "C" | "U") {
     let asyncData: any;
-    if (!!verify.getToken(req).userId) {
+    if (!!verify.getToken(req)?.userId) {
       const createInfo = {
         content: req.body.content,
         location: req.body.location,
@@ -63,7 +63,7 @@ class UserModel {
       asyncData = new Promise((resolve) => {
         resolve({
           message: "user unauthorized",
-          errorStatus: 401,
+          statusCode: 401,
         } as ErrorContent);
       });
     }
