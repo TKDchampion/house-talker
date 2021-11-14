@@ -18,8 +18,18 @@ class UserController {
     result.then((response: any) => res.send(response));
   }
 
-  getUserCounts(req: Request, res: Response) {
-    const result = userModel.getUserCounts(req);
+  //   getUserCounts(req: Request, res: Response) {
+  //     const result = userModel.getUserCounts(req);
+  //     result.then((response: any) => res.send(response));
+  //   }
+
+  createArticle(req: Request, res: Response) {
+    const result = userModel.createOrUpdateArticle(req, "C");
+    result.then((response: any) => res.send(response));
+  }
+
+  updateArticle(req: Request, res: Response) {
+    const result = userModel.createOrUpdateArticle(req, "U");
     result.then((response: any) => res.send(response));
   }
 
