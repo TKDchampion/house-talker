@@ -12,8 +12,6 @@ export class UserRoute extends Route {
     this.router.get("/getAllAccounts", userController.getAllAccounts);
     this.router.post("/login", userController.login);
     this.router.post("/singin", userController.singin);
-    this.router.post("/createArticle", userController.createArticle);
-    this.router.put("/updateArticle", userController.updateArticle);
     // this.router.get("/test", userController.test);
     this.router.put("/test", userController.test);
   }

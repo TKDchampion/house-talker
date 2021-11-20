@@ -2,8 +2,8 @@ import { db } from "../database/setting";
 import { dataBase } from "../database/db-interface";
 import { UserInfoInstance, UserInfo } from "../view-model/user-view-model";
 import { ErrorContent } from "../view-model/error-viewmodel";
-import { verify } from "./verify-model";
 import { Key } from "../database/private-key";
+import { generator } from "./common-model/generator";
 
 const jwt = require("jsonwebtoken");
 
@@ -37,40 +37,6 @@ class UserModel {
     return asyncData;
   }
 
-  public createOrUpdateArticle(req: any, type: "C" | "U") {
-    let asyncData: any;
-    if (!!verify.getToken(req)?.userId) {
-      const createInfo = {
-        content: req.body.content,
-        location: req.body.location,
-        nickName: req.body.nickName,
-        summaryContnet: req.body.summaryContnet,
-        tips: req.body.tips,
-        title: req.body.title,
-        time: Date.now(),
-        userId: verify.getToken(req).userId,
-      };
-      const reference = db.collection("article").doc("detail-article");
-      const articleId =
-        type === "C" ? `article${this.generatorId()}` : req.query.articleId;
-      const setParams: any = {};
-      setParams[articleId] = createInfo;
-      asyncData = dataBase.put({
-        reference: reference,
-        setParams: setParams,
-      });
-    } else {
-      asyncData = new Promise((resolve) => {
-        resolve({
-          message: "user unauthorized",
-          statusCode: 401,
-        } as ErrorContent);
-      });
-    }
-
-    return asyncData;
-  }
-
   public login(req: any) {
     const account = req.body.account;
     const password = req.body.password;
@@ -85,7 +51,7 @@ class UserModel {
     const account = req.body.account;
     const password = req.body.password;
     const reference = db.collection("users").doc("user");
-    const userId = `user${this.generatorId()}`;
+    const userId = `user${generator.generatorId()}`;
     const setParams: any = {};
     setParams[userId] = {
       account,
@@ -99,13 +65,6 @@ class UserModel {
     return asyncData;
   }
 
-  private generatorId() {
-    return (
-      Math.random().toString(36).substr(2, 7) +
-      Date.now().toString(36).substr(4, 9)
-    );
-  }
-
   private verify(userinfo: UserInfo) {
     const formatResultFn = (result: any) => {
       const resultData = Object.values(result.data());
@@ -115,8 +74,6 @@ class UserModel {
           data.password === userinfo.password
       );
       if (user) {
-        console.log(Key.JWT);
-
         const payload = JSON.parse(JSON.stringify(new UserInfoInstance(user)));
         const token = jwt.sign(payload, Key.JWT);
         return {
