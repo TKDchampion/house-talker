@@ -11,5 +11,9 @@ export class ArticleRoute extends Route {
   protected setRoutes() {
     this.router.post("/createArticle", articleController.createArticle);
     this.router.put("/updateArticle", articleController.updateArticle);
+    this.router.get(
+      "/getAllNewsArticles",
+      articleController.getAllNewsArticles
+    );
   }
 }

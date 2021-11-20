@@ -3,11 +3,16 @@ import { dataBase } from "../database/db-interface";
 import { ErrorContent } from "../view-model/error-viewmodel";
 import { verify } from "./verify-model";
 import { generator } from "./common-model/generator";
+import * as moment from "moment";
 
 class ArticleModel {
   public createOrUpdateArticle(req: any, type: "C" | "U") {
     let asyncData: any;
     if (!!verify.getToken(req)?.userId) {
+      const articleId =
+        type === "C"
+          ? `article${generator.generatorId()}`
+          : req.query.articleId;
       const createInfo = {
         content: req.body.content,
         location: req.body.location,
@@ -15,14 +20,11 @@ class ArticleModel {
         summaryContnet: req.body.summaryContnet,
         tips: req.body.tips,
         title: req.body.title,
-        time: Date.now(),
+        time: moment(new Date()).format("YYYY/MM/DD"),
         userId: verify.getToken(req).userId,
+        articleId,
       };
       const reference = db.collection("article").doc("detail-article");
-      const articleId =
-        type === "C"
-          ? `article${generator.generatorId()}`
-          : req.query.articleId;
       const setParams: any = {};
       setParams[articleId] = createInfo;
       asyncData = dataBase.put({
@@ -37,6 +39,23 @@ class ArticleModel {
         } as ErrorContent);
       });
     }
+
+    return asyncData;
+  }
+
+  public getAllNewsArticles(req: any) {
+    const reference = db.collection("article").doc("detail-article");
+    const articleList: any[] = [];
+    const formatResultFn = (result: any) => {
+      const allArticleData = result.data();
+      const allArticleIds = Object.keys(allArticleData);
+      allArticleIds.forEach((id: string, index: number) => {
+        articleList[index] = allArticleData[id];
+      });
+
+      return articleList;
+    };
+    const asyncData = dataBase.get({ reference: reference }, formatResultFn);
 
     return asyncData;
   }

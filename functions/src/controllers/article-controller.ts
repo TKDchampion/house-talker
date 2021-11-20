@@ -14,6 +14,11 @@ class ArticleController {
     const result = articleModel.createOrUpdateArticle(req, "U");
     result.then((response: any) => res.send(response));
   }
+
+  getAllNewsArticles(req: Request, res: Response) {
+    const result = articleModel.getAllNewsArticles(req);
+    result.then((response: any) => res.send(response));
+  }
 }
 
 export const articleController = new ArticleController();
