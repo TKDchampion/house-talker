@@ -43,6 +43,31 @@ class ArticleModel {
     return asyncData;
   }
 
+  public getArticeForUser(req: any) {
+    let asyncData: any;
+    if (!!verify.getToken(req)?.userId) {
+      const reference = db.collection("article").doc("detail-article");
+      const articleList: any[] = [];
+      const formatResultFn = (result: any) => {
+        const allArticleData = result.data();
+        const allArticleIds = Object.keys(allArticleData);
+        allArticleIds.forEach((id: string, index: number) => {
+          if (allArticleData[id]["userId"] === verify.getToken(req).userId) {
+            articleList[index] = allArticleData[id];
+            delete articleList[index]["content"];
+          }
+        });
+
+        return articleList;
+      };
+      asyncData = dataBase.get({ reference: reference }, formatResultFn);
+    } else {
+      asyncData = verify.promiseError();
+    }
+
+    return asyncData;
+  }
+
   public getAllNewsArticles(req: any) {
     const reference = db.collection("article").doc("detail-article");
     const articleList: any[] = [];
@@ -51,9 +76,23 @@ class ArticleModel {
       const allArticleIds = Object.keys(allArticleData);
       allArticleIds.forEach((id: string, index: number) => {
         articleList[index] = allArticleData[id];
+        delete articleList[index]["content"];
       });
 
       return articleList;
+    };
+    const asyncData = dataBase.get({ reference: reference }, formatResultFn);
+
+    return asyncData;
+  }
+
+  public getDetailsArticle(req: any) {
+    const reference = db.collection("article").doc("detail-article");
+    const articleId = req.query.articleId;
+    const formatResultFn = (result: any) => {
+      const allArticleData = result.data();
+
+      return allArticleData[articleId];
     };
     const asyncData = dataBase.get({ reference: reference }, formatResultFn);
 
