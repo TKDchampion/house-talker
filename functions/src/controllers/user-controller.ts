@@ -10,7 +10,10 @@ class UserController {
 
   login(req: Request, res: Response) {
     const result = userModel.login(req);
-    result.then((response: any) => res.send(response));
+    result.then((response: any) => {
+      const statusCode = response.statusCode ? response.statusCode : 200;
+      return res.status(statusCode).send(response);
+    });
   }
 
   singin(req: Request, res: Response) {

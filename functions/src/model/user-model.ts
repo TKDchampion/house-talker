@@ -50,6 +50,7 @@ class UserModel {
   public singin(req: any) {
     const account = req.body.account;
     const password = req.body.password;
+    const nickName = req.body.nickName;
     const reference = db.collection("users").doc("user");
     const userId = `user${generator.generatorId()}`;
     const setParams: any = {};
@@ -57,6 +58,7 @@ class UserModel {
       account,
       password,
       userId,
+      nickName,
     };
     const asyncData = dataBase.post({
       reference: reference,
@@ -80,10 +82,14 @@ class UserModel {
           access_token: token,
           token_type: "Bearer",
           account: user.account,
+          nickName: user.nickName,
           userId: user.userId,
         };
       }
-      return { message: "user unauthorized", errorStatus: 401 } as ErrorContent;
+      return {
+        message: "user unauthorized",
+        statusCode: 401,
+      } as ErrorContent;
     };
     return formatResultFn;
   }

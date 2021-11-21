@@ -6,9 +6,15 @@ import { generator } from "./common-model/generator";
 import * as moment from "moment";
 
 class ArticleModel {
-  public createOrUpdateArticle(req: any, type: "C" | "U") {
+  // todo need verify.getToken(req)?.userId === articleId.userId
+  public async createOrUpdateArticle(req: any, type: "C" | "U") {
+    const validateMothed =
+      type === "U"
+        ? await this.isArticleOwner(req)
+        : !!verify.getToken(req)?.userId;
+
     let asyncData: any;
-    if (!!verify.getToken(req)?.userId) {
+    if (validateMothed) {
       const articleId =
         type === "C"
           ? `article${generator.generatorId()}`
@@ -41,6 +47,28 @@ class ArticleModel {
     }
 
     return asyncData;
+  }
+
+  public isArticleOwner(req: any) {
+    if (!verify.getToken(req)?.userId) {
+      return false;
+    }
+
+    const reference = db.collection("article").doc("detail-article");
+    const formatResultFn = (result: any) => {
+      const allArticleData = result.data();
+      return allArticleData[req.query.articleId]["userId"];
+    };
+
+    let ownerId: string;
+    return dataBase
+      .get({ reference: reference }, formatResultFn)
+      .then((userId: string) => {
+        ownerId = userId;
+        return new Promise((resolve) => {
+          resolve(ownerId === verify.getToken(req)?.userId);
+        });
+      });
   }
 
   public getArticeForUser(req: any) {
