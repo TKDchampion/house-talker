@@ -5,7 +5,6 @@ import { generator } from "./common-model/generator";
 import * as moment from "moment";
 
 class ArticleModel {
-  // todo need verify.getToken(req)?.userId === articleId.userId
   public async createOrUpdateArticle(req: any, type: "C" | "U") {
     const validateMothed =
       type === "U"

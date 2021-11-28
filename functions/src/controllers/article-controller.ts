@@ -12,7 +12,10 @@ class ArticleController {
 
   updateArticle(req: Request, res: Response) {
     const result = articleModel.createOrUpdateArticle(req, "U");
-    result.then((response: any) => res.send(response));
+    result.then((response: any) => {
+      const statusCode = response.statusCode ? response.statusCode : 200;
+      return res.status(statusCode).send(response);
+    });
   }
 
   getAllNewsArticles(req: Request, res: Response) {
