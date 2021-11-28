@@ -1,4 +1,5 @@
 import { DbViewModel } from "../view-model/db-view-model";
+import * as admin from "firebase-admin";
 
 class DbInterface {
   get(params: DbViewModel, formatResultFn?: Function) {
@@ -32,7 +33,7 @@ class DbInterface {
 
   delete(params: DbViewModel, verify?: Function) {
     const deleteObject = {
-      [`${params.setParams}`]: params.reference.delete(),
+      [`${params.setParams}`]: admin.firestore.FieldValue.delete(),
     };
     return params.reference.update(deleteObject).then((res: any) => {
       if (verify) {

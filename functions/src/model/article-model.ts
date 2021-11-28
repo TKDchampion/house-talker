@@ -49,10 +49,9 @@ class ArticleModel {
     let asyncData: any;
     if (validateMothed) {
       const reference = db.collection("article").doc("detail-article");
-      const setParams = req.query.articleId;
       asyncData = dataBase.delete({
         reference: reference,
-        setParams: setParams,
+        setParams: req.query.articleId,
       });
     } else {
       asyncData = verify.promiseError();
@@ -69,7 +68,7 @@ class ArticleModel {
     const reference = db.collection("article").doc("detail-article");
     const formatResultFn = (result: any) => {
       const allArticleData = result.data();
-      return allArticleData[req.query.articleId]["userId"];
+      return allArticleData[req.query.articleId]?.userId;
     };
 
     let ownerId: string;
