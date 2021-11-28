@@ -1,6 +1,5 @@
 import { db } from "../database/setting";
 import { dataBase } from "../database/db-interface";
-import { ErrorContent } from "../view-model/error-viewmodel";
 import { verify } from "./verify-model";
 import { generator } from "./common-model/generator";
 import * as moment from "moment";
@@ -38,12 +37,25 @@ class ArticleModel {
         setParams: setParams,
       });
     } else {
-      asyncData = new Promise((resolve) => {
-        resolve({
-          message: "user unauthorized",
-          statusCode: 401,
-        } as ErrorContent);
+      asyncData = verify.promiseError();
+    }
+
+    return asyncData;
+  }
+
+  public async deleteArticle(req: any) {
+    const validateMothed = await this.isArticleOwner(req);
+
+    let asyncData: any;
+    if (validateMothed) {
+      const reference = db.collection("article").doc("detail-article");
+      const setParams = req.query.articleId;
+      asyncData = dataBase.delete({
+        reference: reference,
+        setParams: setParams,
       });
+    } else {
+      asyncData = verify.promiseError();
     }
 
     return asyncData;

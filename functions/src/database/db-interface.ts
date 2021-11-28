@@ -29,6 +29,18 @@ class DbInterface {
       return res;
     });
   }
+
+  delete(params: DbViewModel, verify?: Function) {
+    const deleteObject = {
+      [`${params.setParams}`]: params.reference.delete(),
+    };
+    return params.reference.update(deleteObject).then((res: any) => {
+      if (verify) {
+        res = verify(res);
+      }
+      return res;
+    });
+  }
 }
 
 export const dataBase = new DbInterface();

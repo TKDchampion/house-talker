@@ -13,6 +13,7 @@ export class ArticleRoute extends Route {
     this.router.put("/updateArticle", articleController.updateArticle);
     this.router.get("/getDetailsArticle", articleController.getDetailsArticle);
     this.router.get("/getArticeForUser", articleController.getArticeForUser);
+    this.router.delete("/deleteArticle", articleController.deleteArticle);
     this.router.get(
       "/getAllNewsArticles",
       articleController.getAllNewsArticles
