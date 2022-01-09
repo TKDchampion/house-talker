@@ -16,8 +16,8 @@ class UserController {
     });
   }
 
-  singin(req: Request, res: Response) {
-    const result = userModel.singin(req);
+  sign(req: Request, res: Response) {
+    const result = userModel.sign(req);
     result.then((response: any) => res.send(response));
   }
 
