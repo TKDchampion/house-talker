@@ -47,7 +47,7 @@ class UserModel {
     return asyncData;
   }
 
-  public singin(req: any) {
+  public signUp(req: any) {
     const account = req.body.account;
     const password = req.body.password;
     const nickName = req.body.nickName;
