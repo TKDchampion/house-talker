@@ -12,5 +12,6 @@ export class CommentRoute extends Route {
     this.router.post("/createComment", commentController.createComment);
     this.router.put("/updateComment", commentController.updateComment);
     this.router.delete("/deleteComment", commentController.deleteComment);
+    this.router.get("/listComment", commentController.getCommentForUser);
   }
 }
