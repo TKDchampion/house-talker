@@ -2,7 +2,7 @@ import { db } from "../database/setting";
 import { dataBase } from "../database/db-interface";
 import { verify } from "./verify-model";
 import { generator } from "./common-model/generator";
-import * as moment from "moment";
+import * as moment from "moment-timezone";
 
 class CommentModel {
   public async createOrUpdateComment(req: any, type: "C" | "U") {
@@ -21,7 +21,9 @@ class CommentModel {
         commentId,
         content: req.body.content,
         articleId: req.body.articleId,
-        time: moment(new Date()).format("YYYY/MM/DD"),
+        time: moment(new Date())
+          .tz("Asia/Taipei")
+          .format("YYYY/MM/DD HH:mm:ss"),
         nickName: verify.getToken(req).nickName,
         userId: verify.getToken(req).userId,
       };

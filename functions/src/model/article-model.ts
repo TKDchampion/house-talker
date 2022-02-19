@@ -24,7 +24,9 @@ class ArticleModel {
         summaryContnet: req.body.summaryContnet,
         tips: req.body.tips,
         title: req.body.title,
-        time: moment(new Date()).format("YYYY/MM/DD"),
+        time: moment(new Date())
+          .tz("Asia/Taipei")
+          .format("YYYY/MM/DD HH:mm:ss"),
         userId: verify.getToken(req).userId,
         articleId,
       };
