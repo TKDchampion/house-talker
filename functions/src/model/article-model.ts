@@ -91,10 +91,10 @@ class ArticleModel {
       const formatResultFn = (result: any) => {
         const allArticleData = result.data();
         const allArticleIds = Object.keys(allArticleData);
-        allArticleIds.forEach((id: string, index: number) => {
+        allArticleIds.forEach((id: string) => {
           if (allArticleData[id]["userId"] === verify.getToken(req).userId) {
-            articleList[index] = allArticleData[id];
-            delete articleList[index]["content"];
+            delete allArticleData[id]["content"];
+            articleList.push(allArticleData[id]);
           }
         });
 

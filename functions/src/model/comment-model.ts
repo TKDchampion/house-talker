@@ -68,10 +68,9 @@ class CommentModel {
         const allCommentsIds = Object.keys(allComments);
         allCommentsIds.forEach((id: string, index: number) => {
           if (allComments[id]["articleId"] === req.query.articleId) {
-            commentList[index] = allComments[id];
+            commentList.push(allComments[id]);
           }
         });
-
         return commentList;
       };
       asyncData = dataBase.get({ reference: reference }, formatResultFn);
