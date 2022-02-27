@@ -100,9 +100,7 @@ class CommentModel {
       .get({ reference: reference }, formatResultFn)
       .then((userId: string) => {
         ownerId = userId;
-        return new Promise((resolve) => {
-          resolve(ownerId === verify.getToken(req)?.userId);
-        });
+        return ownerId === verify.getToken(req)?.userId;
       });
   }
 }

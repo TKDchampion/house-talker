@@ -1,3 +1,4 @@
+import { verify } from "./verify-model";
 import { db } from "../database/setting";
 import { dataBase } from "../database/db-interface";
 import { UserInfoInstance, UserInfo } from "../view-model/user-view-model";
@@ -47,24 +48,53 @@ class UserModel {
     return asyncData;
   }
 
-  public signUp(req: any) {
-    const account = req.body.account;
-    const password = req.body.password;
-    const nickName = req.body.nickName;
-    const reference = db.collection("users").doc("user");
-    const userId = `user${generator.generatorId()}`;
-    const setParams: any = {};
-    setParams[userId] = {
-      account,
-      password,
-      userId,
-      nickName,
-    };
-    const asyncData = dataBase.post({
-      reference: reference,
-      setParams: setParams,
-    });
+  public async signUp(req: any) {
+    const isRepeat = await this.isRepeatAccount(req);
+
+    let asyncData: any;
+    if (isRepeat) {
+      asyncData = verify.promiseError("帳號已存在", 400);
+    } else {
+      const account = req.body.account;
+      const password = req.body.password;
+      const nickName = req.body.nickName;
+      const reference = db.collection("users").doc("user");
+      const userId = `user${generator.generatorId()}`;
+      const setParams: any = {};
+      setParams[userId] = {
+        account,
+        password,
+        userId,
+        nickName,
+      };
+      asyncData = dataBase.post({
+        reference: reference,
+        setParams: setParams,
+      });
+    }
     return asyncData;
+  }
+
+  private isRepeatAccount(req: any) {
+    const reference = db.collection("users").doc("user");
+    const formatResultFn = (result: any) => {
+      const allUsers = result.data();
+      const allUsersIds = Object.keys(allUsers);
+      const allUserList: any[] = [];
+      allUsersIds.forEach((id: string, index: number) => {
+        allUserList[index] = allUsers[id];
+      });
+
+      return allUserList;
+    };
+
+    let isAccount: string;
+    return dataBase
+      .get({ reference: reference }, formatResultFn)
+      .then((list: any[]) => {
+        isAccount = list.find((i) => i.account === req.body.account);
+        return isAccount;
+      });
   }
 
   private verify(userinfo: UserInfo) {

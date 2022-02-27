@@ -23,15 +23,11 @@ class VerifyModel {
     }
   }
 
-  public formatResultErrorFn = (result: any) => {
-    return { message: "user unauthorized", errorStatus: 401 } as ErrorContent;
-  };
-
-  public promiseError = () => {
+  public promiseError = (message = "user unauthorized", statusCode = 401) => {
     return new Promise((resolve) => {
       resolve({
-        message: "user unauthorized",
-        statusCode: 401,
+        message,
+        statusCode,
       } as ErrorContent);
     });
   };
