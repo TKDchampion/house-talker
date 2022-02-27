@@ -18,8 +18,8 @@ class CommentController {
     });
   }
 
-  getCommentForUser(req: Request, res: Response) {
-    const result = commentModel.getCommentForUser(req);
+  getCommentForArticle(req: Request, res: Response) {
+    const result = commentModel.getCommentForArticle(req);
     result.then((response: any) => {
       const statusCode = response.statusCode ? response.statusCode : 200;
       return res.status(statusCode).send(response);

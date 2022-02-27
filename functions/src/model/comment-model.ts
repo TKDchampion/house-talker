@@ -58,28 +58,21 @@ class CommentModel {
     return asyncData;
   }
 
-  public getCommentForUser(req: any) {
-    let asyncData: any;
-    if (!!verify.getToken(req)?.userId) {
-      const reference = db.collection("comments").doc("comment");
-      const commentList: any[] = [];
-      const formatResultFn = (result: any) => {
-        const allComments = result.data();
-        const allCommentsIds = Object.keys(allComments);
-        allCommentsIds.forEach((id: string, index: number) => {
-          if (allComments[id]["articleId"] === req.query.articleId) {
-            commentList.push(allComments[id]);
-          }
-        });
+  public getCommentForArticle(req: any) {
+    const reference = db.collection("comments").doc("comment");
+    const commentList: any[] = [];
+    const formatResultFn = (result: any) => {
+      const allComments = result.data();
+      const allCommentsIds = Object.keys(allComments);
+      allCommentsIds.forEach((id: string, index: number) => {
+        if (allComments[id]["articleId"] === req.query.articleId) {
+          commentList.push(allComments[id]);
+        }
+      });
 
-        return req.query.type === "counts"
-          ? { counts: commentList.length }
-          : commentList;
-      };
-      asyncData = dataBase.get({ reference: reference }, formatResultFn);
-    } else {
-      asyncData = verify.promiseError();
-    }
+      return commentList;
+    };
+    const asyncData = dataBase.get({ reference: reference }, formatResultFn);
 
     return asyncData;
   }

@@ -9,23 +9,6 @@ import { generator } from "./common-model/generator";
 const jwt = require("jsonwebtoken");
 
 class UserModel {
-  public getAllAccounts(req: any) {
-    const reference = db.collection("users");
-    const fights: any[] = [];
-    const formatResultFn = (result: any) => {
-      result.forEach((doc: any) => {
-        fights.push({
-          id: doc.id,
-          data: doc.data(),
-        });
-      });
-      return fights;
-    };
-    const asyncData = dataBase.get({ reference: reference }, formatResultFn);
-
-    return asyncData;
-  }
-
   test(req: any) {
     const obj = req.body;
     const reference = db.collection("article").doc("test");

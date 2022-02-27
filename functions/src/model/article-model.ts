@@ -3,6 +3,7 @@ import { dataBase } from "../database/db-interface";
 import { verify } from "./verify-model";
 import { generator } from "./common-model/generator";
 import * as moment from "moment";
+import { commentModel } from "./comment-model";
 
 class ArticleModel {
   public async createOrUpdateArticle(req: any, type: "C" | "U") {
@@ -86,15 +87,22 @@ class ArticleModel {
     if (!!verify.getToken(req)?.userId) {
       const reference = db.collection("article").doc("detail-article");
       const articleList: any[] = [];
-      const formatResultFn = (result: any) => {
+      const formatResultFn = async (result: any) => {
         const allArticleData = result.data();
         const allArticleIds = Object.keys(allArticleData);
-        allArticleIds.forEach((id: string) => {
+
+        for (let index = 0; index < allArticleIds.length; index++) {
+          const id = allArticleIds[index];
           if (allArticleData[id]["userId"] === verify.getToken(req).userId) {
             delete allArticleData[id]["content"];
             articleList.push(allArticleData[id]);
+            const comments = await commentModel.getCommentForArticle({
+              query: { articleId: id },
+            });
+
+            articleList[index]["countsComment"] = comments.length;
           }
-        });
+        }
 
         return articleList;
       };
@@ -109,14 +117,20 @@ class ArticleModel {
   public getAllNewsArticles(req: any) {
     const reference = db.collection("article").doc("detail-article");
     const articleList: any[] = [];
-    const formatResultFn = (result: any) => {
+    const formatResultFn = async (result: any) => {
       const allArticleData = result.data();
       const allArticleIds = Object.keys(allArticleData);
-      allArticleIds.forEach((id: string, index: number) => {
+
+      for (let index = 0; index < allArticleIds.length; index++) {
+        const id = allArticleIds[index];
         articleList[index] = allArticleData[id];
         delete articleList[index]["content"];
-      });
+        const comments = await commentModel.getCommentForArticle({
+          query: { articleId: id },
+        });
 
+        articleList[index]["countsComment"] = comments.length;
+      }
       return articleList;
     };
     const asyncData = dataBase.get({ reference: reference }, formatResultFn);
