@@ -53,7 +53,7 @@ class UserModel {
 
     let asyncData: any;
     if (isRepeat) {
-      asyncData = verify.promiseError("帳號已存在", 400);
+      asyncData = verify.promiseError("帳號已存在", 403);
     } else {
       const account = req.body.account;
       const password = req.body.password;
@@ -92,7 +92,10 @@ class UserModel {
     return dataBase
       .get({ reference: reference }, formatResultFn)
       .then((list: any[]) => {
-        isAccount = list.find((i) => i.account === req.body.account);
+        isAccount = list.find(
+          (i) =>
+            i.account === req.body.account || i.nickName === req.body.nickName
+        );
         return isAccount;
       });
   }
@@ -120,7 +123,7 @@ class UserModel {
       }
       return {
         message: "user unauthorized",
-        statusCode: 401,
+        statusCode: 403,
       } as ErrorContent;
     };
     return formatResultFn;
