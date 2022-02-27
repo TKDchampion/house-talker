@@ -77,7 +77,9 @@ class UserModel {
       );
       if (user) {
         const payload = JSON.parse(JSON.stringify(new UserInfoInstance(user)));
-        const token = jwt.sign(payload, Key.JWT);
+        const token = jwt.sign(payload, Key.JWT, {
+          expiresIn: "1d",
+        });
         return {
           access_token: token,
           token_type: "Bearer",

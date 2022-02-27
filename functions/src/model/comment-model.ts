@@ -71,7 +71,10 @@ class CommentModel {
             commentList.push(allComments[id]);
           }
         });
-        return commentList;
+
+        return req.query.type === "counts"
+          ? { counts: commentList.length }
+          : commentList;
       };
       asyncData = dataBase.get({ reference: reference }, formatResultFn);
     } else {
