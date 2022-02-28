@@ -3,8 +3,9 @@ import { db } from "../database/setting";
 import { dataBase } from "../database/db-interface";
 import { UserInfoInstance, UserInfo } from "../view-model/user-view-model";
 import { ErrorContent } from "../view-model/error-viewmodel";
-import { Key } from "../database/private-key";
+import { Key, SMTPconfig } from "../database/private-key";
 import { generator } from "./common-model/generator";
+import * as nodemailer from "nodemailer";
 
 const jwt = require("jsonwebtoken");
 
@@ -44,18 +45,76 @@ class UserModel {
       const reference = db.collection("users").doc("user");
       const userId = `user${generator.generatorId()}`;
       const setParams: any = {};
+      const formatResultFn = async () => {
+        return await this.sendEmail(req);
+      };
+
       setParams[userId] = {
         account,
         password,
         userId,
         nickName,
       };
-      asyncData = dataBase.post({
-        reference: reference,
-        setParams: setParams,
-      });
+      asyncData = dataBase.post(
+        {
+          reference: reference,
+          setParams: setParams,
+        },
+        true,
+        formatResultFn
+      );
     }
     return asyncData;
+  }
+
+  private sendEmail(req: any) {
+    const link = `http://localhost:5001/talker-9f1f9/us-central1/webApi/activate?token=${this.createToken(
+      req
+    )} `;
+    const text = `請點選連結啟用: <a href=${link}> ${link}</a>`;
+
+    const transporter = nodemailer.createTransport({
+      host: SMTPconfig.host,
+      port: SMTPconfig.port,
+      secure: SMTPconfig.secure,
+      auth: {
+        user: SMTPconfig.auth.user,
+        pass: SMTPconfig.auth.pass,
+      },
+    });
+    const mailOptions = {
+      from: SMTPconfig.auth.user,
+      // to: req.body.account,
+      to: "rakon52701@shackvine.com",
+      subject: "House Talker 啟用信",
+      html: text,
+    };
+
+    return new Promise((resolve) => {
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          resolve(verify.promiseError("寄信有誤", 401));
+        }
+        resolve({
+          message: "success",
+          statusCode: "200",
+        });
+      });
+    });
+  }
+
+  createToken(req: any) {
+    const user: UserInfo = {
+      account: req.body.account,
+      password: req.body.password,
+      userId: req.body.userId,
+      nickName: req.body.nickName,
+    };
+    const payload = JSON.parse(JSON.stringify(new UserInfoInstance(user)));
+    const token = jwt.sign(payload, Key.JWT, {
+      expiresIn: "1d",
+    });
+    return token;
   }
 
   private isRepeatAccount(req: any) {
