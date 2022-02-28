@@ -54,6 +54,7 @@ class UserModel {
         password,
         userId,
         nickName,
+        activate: false,
       };
       asyncData = dataBase.post(
         {
@@ -84,7 +85,7 @@ class UserModel {
     });
     const mailOptions = {
       from: SMTPconfig.auth.user,
-      // to: req.body.account,
+      //TODO to: req.body.account,
       to: "rakon52701@shackvine.com",
       subject: "House Talker 啟用信",
       html: text,
@@ -150,7 +151,8 @@ class UserModel {
           data.account === userinfo.account &&
           data.password === userinfo.password
       );
-      if (user) {
+
+      if (user && user.activate === true) {
         const payload = JSON.parse(JSON.stringify(new UserInfoInstance(user)));
         const token = jwt.sign(payload, Key.JWT, {
           expiresIn: "1d",
