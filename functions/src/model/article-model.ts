@@ -22,6 +22,7 @@ class ArticleModel {
         content: req.body.content,
         location: req.body.location,
         nickName: req.body.nickName,
+        isHiddenName: req.body.isHiddenName,
         summaryContnet: req.body.summaryContnet,
         tips: req.body.tips,
         title: req.body.title,
@@ -124,6 +125,9 @@ class ArticleModel {
       for (let index = 0; index < allArticleIds.length; index++) {
         const id = allArticleIds[index];
         articleList[index] = allArticleData[id];
+        if (articleList[index].isHiddenName) {
+          articleList[index].nickName = "匿名";
+        }
         delete articleList[index]["content"];
         const comments = await commentModel.getCommentForArticle({
           query: { articleId: id },
@@ -138,12 +142,15 @@ class ArticleModel {
     return asyncData;
   }
 
-  public getDetailsArticle(req: any) {
+  public async getDetailsArticle(req: any) {
+    const validateMothed = await this.isArticleOwner(req);
     const reference = db.collection("article").doc("detail-article");
     const articleId = req.query.articleId;
     const formatResultFn = (result: any) => {
       const allArticleData = result.data();
-
+      if (!validateMothed) {
+        allArticleData[articleId].nickName = "匿名";
+      }
       return allArticleData[articleId];
     };
     const asyncData = dataBase.get({ reference: reference }, formatResultFn);
