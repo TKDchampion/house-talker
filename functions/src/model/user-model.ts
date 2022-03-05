@@ -25,11 +25,59 @@ class UserModel {
   public login(req: any) {
     const account = req.body.account;
     const password = req.body.password;
-    const user = new UserInfoInstance({ account, password });
+    const user = { account, password };
     const dbRoute = "users";
     const reference = db.collection(dbRoute).doc("user");
     const asyncData = dataBase.get({ reference: reference }, this.verify(user));
     return asyncData;
+  }
+
+  public async activate(req: any) {
+    const userInfo = await this.getUsers(req);
+    let asyncData: any;
+    if (userInfo) {
+      userInfo.info.activate = true;
+      const reference = db.collection("users").doc("user");
+      const setParams: any = {};
+      setParams[userInfo.id] = userInfo.info;
+      asyncData = dataBase.put({
+        reference: reference,
+        setParams: setParams,
+      });
+    } else {
+      asyncData = verify.promiseError("驗證失效", 403);
+    }
+
+    return asyncData;
+  }
+
+  private getUsers(req: any) {
+    const taken = req.query.token;
+    const verifyToken = verify.getTokenAlready(taken);
+    const reference = db.collection("users").doc("user");
+    const formatResultFn = (result: any) => {
+      const data = result.data();
+      let userInfo;
+      for (const key in data) {
+        if (
+          key === verifyToken.userId &&
+          data[key].account === verifyToken.account
+        ) {
+          userInfo = {
+            id: key,
+            info: data[key],
+          };
+          break;
+        }
+      }
+      return userInfo;
+    };
+
+    return !!verifyToken
+      ? dataBase
+          .get({ reference: reference }, formatResultFn)
+          .then((item: any) => item)
+      : "";
   }
 
   public async signUp(req: any) {
@@ -46,7 +94,7 @@ class UserModel {
       const userId = `user${generator.generatorId()}`;
       const setParams: any = {};
       const formatResultFn = async () => {
-        return await this.sendEmail(req);
+        return await this.sendEmail({ account, nickName, userId });
       };
 
       setParams[userId] = {
@@ -68,9 +116,9 @@ class UserModel {
     return asyncData;
   }
 
-  private sendEmail(req: any) {
+  private sendEmail(userInfo: UserInfo) {
     const link = `http://localhost:5001/talker-9f1f9/us-central1/webApi/activate?token=${this.createToken(
-      req
+      userInfo
     )} `;
     const text = `請點選連結啟用: <a href=${link}> ${link}</a>`;
 
@@ -85,8 +133,7 @@ class UserModel {
     });
     const mailOptions = {
       from: SMTPconfig.auth.user,
-      //TODO to: req.body.account,
-      to: "rakon52701@shackvine.com",
+      to: userInfo.account,
       subject: "House Talker 啟用信",
       html: text,
     };
@@ -104,16 +151,10 @@ class UserModel {
     });
   }
 
-  createToken(req: any) {
-    const user: UserInfo = {
-      account: req.body.account,
-      password: req.body.password,
-      userId: req.body.userId,
-      nickName: req.body.nickName,
-    };
-    const payload = JSON.parse(JSON.stringify(new UserInfoInstance(user)));
+  createToken(userInfo: UserInfo) {
+    const payload = JSON.parse(JSON.stringify(new UserInfoInstance(userInfo)));
     const token = jwt.sign(payload, Key.JWT, {
-      expiresIn: "1d",
+      expiresIn: "10m",
     });
     return token;
   }

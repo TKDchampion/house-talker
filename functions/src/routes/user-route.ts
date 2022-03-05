@@ -13,5 +13,6 @@ export class UserRoute extends Route {
     this.router.post("/signUp", userController.signUp);
     // this.router.get("/test", userController.test);
     this.router.put("/test", userController.test);
+    this.router.post("/activate", userController.activate);
   }
 }

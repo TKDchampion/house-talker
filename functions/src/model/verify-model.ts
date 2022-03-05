@@ -4,9 +4,6 @@ import { ErrorContent } from "../view-model/error-viewmodel";
 const jwt = require("jsonwebtoken");
 
 class VerifyModel {
-  public account: string = "";
-  public password: string = "";
-
   public getToken(req: any) {
     const token = req.header("Authorization");
     if (!token) {
@@ -19,7 +16,19 @@ class VerifyModel {
         Key.JWT
       );
     } catch (error) {
+      return false;
+    }
+  }
+
+  public getTokenAlready(token: string) {
+    if (!token) {
       return;
+    }
+
+    try {
+      return jwt.verify(token, Key.JWT);
+    } catch (error) {
+      return false;
     }
   }
 
