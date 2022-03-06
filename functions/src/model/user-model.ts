@@ -117,10 +117,10 @@ class UserModel {
   }
 
   private sendEmail(userInfo: UserInfo) {
-    const link = `https://talker-9f1f9.web.app/app/activate?token=${this.createToken(
+    const link = `https://house-talker.com/app/activate?token=${this.createToken(
       userInfo
     )} `;
-    const text = `請點選連結啟用: <a href=${link}> ${link}</a>`;
+    const text = `請點選連結啟用: <a href=${link}> ${link}</a><br/><br/><br/><br/><br/><div>如有任何問題歡迎來信詢問: housetalkertw@gmail.com</div>`;
 
     const transporter = nodemailer.createTransport({
       host: SMTPconfig.host,
