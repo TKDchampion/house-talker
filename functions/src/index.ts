@@ -13,7 +13,14 @@ import {
 const app = express();
 const main = express();
 
-app.use(cors());
+// const corsSetting = {
+//   origin: "*",
+//   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+//   preflightContinue: false,
+//   optionsSuccessStatus: 204,
+// };
+
+app.use(cors);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
