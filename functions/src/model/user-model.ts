@@ -117,7 +117,7 @@ class UserModel {
   }
 
   private sendEmail(userInfo: UserInfo) {
-    const link = `http://localhost:4200/app/activate?token=${this.createToken(
+    const link = `https://talker-9f1f9.web.app/app/activate?token=${this.createToken(
       userInfo
     )} `;
     const text = `請點選連結啟用: <a href=${link}> ${link}</a>`;
