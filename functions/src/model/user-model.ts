@@ -52,8 +52,8 @@ class UserModel {
   }
 
   private getUsers(req: any) {
-    const taken = req.query.token;
-    const verifyToken = verify.getTokenAlready(taken);
+    const token = req.query.token;
+    const verifyToken = verify.getTokenAlready(token);
     const reference = db.collection("users").doc("user");
     const formatResultFn = (result: any) => {
       const data = result.data();
@@ -117,7 +117,7 @@ class UserModel {
   }
 
   private sendEmail(userInfo: UserInfo) {
-    const link = `http://localhost:5001/talker-9f1f9/us-central1/webApi/activate?token=${this.createToken(
+    const link = `http://localhost:4200/app/activate?token=${this.createToken(
       userInfo
     )} `;
     const text = `請點選連結啟用: <a href=${link}> ${link}</a>`;

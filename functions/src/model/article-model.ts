@@ -71,7 +71,9 @@ class ArticleModel {
     const reference = db.collection("article").doc("detail-article");
     const formatResultFn = (result: any) => {
       const allArticleData = result.data();
-      return allArticleData[req.query.articleId]?.userId;
+      return allArticleData[req.query.articleId]
+        ? allArticleData[req.query.articleId].userId
+        : "";
     };
 
     let ownerId: string;
@@ -80,6 +82,20 @@ class ArticleModel {
       .then((userId: string) => {
         ownerId = userId;
         return ownerId === verify.getToken(req)?.userId;
+      });
+  }
+
+  public isArticleNotFound(req: any) {
+    const reference = db.collection("article").doc("detail-article");
+    const formatResultFn = (result: any) => {
+      const allArticleData = result.data();
+      return allArticleData[req.query.articleId] ? true : false;
+    };
+
+    return dataBase
+      .get({ reference: reference }, formatResultFn)
+      .then((state: boolean) => {
+        return state;
       });
   }
 
@@ -143,17 +159,23 @@ class ArticleModel {
   }
 
   public async getDetailsArticle(req: any) {
+    const isFound = await this.isArticleNotFound(req);
     const validateMothed = await this.isArticleOwner(req);
-    const reference = db.collection("article").doc("detail-article");
-    const articleId = req.query.articleId;
-    const formatResultFn = (result: any) => {
-      const allArticleData = result.data();
-      if (!validateMothed) {
-        allArticleData[articleId].nickName = "匿名";
-      }
-      return allArticleData[articleId];
-    };
-    const asyncData = dataBase.get({ reference: reference }, formatResultFn);
+    let asyncData: any;
+    if (isFound) {
+      const reference = db.collection("article").doc("detail-article");
+      const articleId = req.query.articleId;
+      const formatResultFn = (result: any) => {
+        const allArticleData = result.data();
+        if (!validateMothed) {
+          allArticleData[articleId].nickName = "匿名";
+        }
+        return allArticleData[articleId];
+      };
+      asyncData = dataBase.get({ reference: reference }, formatResultFn);
+    } else {
+      asyncData = verify.promiseError();
+    }
 
     return asyncData;
   }

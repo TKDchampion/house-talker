@@ -25,7 +25,10 @@ class ArticleController {
 
   getDetailsArticle(req: Request, res: Response) {
     const result = articleModel.getDetailsArticle(req);
-    result.then((response: any) => res.send(response));
+    result.then((response: any) => {
+      const statusCode = response.statusCode ? response.statusCode : 200;
+      return res.status(statusCode).send(response);
+    });
   }
 
   getArticeForUser(req: Request, res: Response) {
