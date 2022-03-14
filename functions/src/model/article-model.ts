@@ -23,7 +23,7 @@ class ArticleModel {
         location: req.body.location,
         nickName: req.body.nickName,
         isHiddenName: req.body.isHiddenName,
-        summaryContnet: req.body.summaryContnet,
+        summaryContent: req.body.summaryContent,
         tips: req.body.tips,
         title: req.body.title,
         time: moment(new Date())
