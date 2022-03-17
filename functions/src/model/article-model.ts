@@ -51,11 +51,25 @@ class ArticleModel {
 
     let asyncData: any;
     if (validateMothed) {
+      const commentsList = await commentModel.getCommentForArticle({
+        query: { articleId: req.query.articleId },
+      });
       const reference = db.collection("article").doc("detail-article");
-      asyncData = dataBase.delete({
+      dataBase.delete({
         reference: reference,
         setParams: req.query.articleId,
       });
+      const referenceComments = db.collection("comments").doc("comment");
+      commentsList.forEach((comment: any) => {
+        dataBase.delete({
+          reference: referenceComments,
+          setParams: comment.commentId,
+        });
+      });
+      asyncData = {
+        message: "Delete success!",
+        statusCode: 200,
+      };
     } else {
       asyncData = verify.promiseError();
     }
